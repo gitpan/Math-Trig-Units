@@ -1,0 +1,290 @@
+<HTML>
+<HEAD>
+<TITLE>Units.pm</TITLE>
+<LINK REL="stylesheet" HREF="../html/docs.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Units.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+    <LI><A HREF="#name">NAME</A></LI>
+    <LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+    <LI><A HREF="#description">DESCRIPTION</A></LI>
+    <UL>
+
+        <UL>
+
+            <LI><A HREF="#units">units</A></LI>
+            <LI><A HREF="#zero">zero</A></LI>
+            <LI><A HREF="#approx">approx</A></LI>
+            <LI><A HREF="#dsin">dsin</A></LI>
+            <LI><A HREF="#dcos">dcos</A></LI>
+            <LI><A HREF="#tan">tan</A></LI>
+            <LI><A HREF="#sec">sec</A></LI>
+            <LI><A HREF="#csc">csc</A></LI>
+            <LI><A HREF="#cot">cot</A></LI>
+            <LI><A HREF="#asin">asin</A></LI>
+            <LI><A HREF="#acos">acos</A></LI>
+            <LI><A HREF="#atan">atan</A></LI>
+            <LI><A HREF="#asec">asec</A></LI>
+            <LI><A HREF="#acsc">acsc</A></LI>
+            <LI><A HREF="#acot">acot</A></LI>
+            <LI><A HREF="#sinh">sinh</A></LI>
+            <LI><A HREF="#cosh">cosh</A></LI>
+            <LI><A HREF="#tanh">tanh</A></LI>
+            <LI><A HREF="#sech">sech</A></LI>
+            <LI><A HREF="#csch">csch</A></LI>
+            <LI><A HREF="#coth">coth</A></LI>
+            <LI><A HREF="#asinh">asinh</A></LI>
+            <LI><A HREF="#acosh">acosh</A></LI>
+            <LI><A HREF="#atanh">atanh</A></LI>
+            <LI><A HREF="#asech">asech</A></LI>
+            <LI><A HREF="#acsch">acsch</A></LI>
+            <LI><A HREF="#acoth">acoth</A></LI>
+        </UL>
+
+    </UL>
+
+    <LI><A HREF="#history">HISTORY</A></LI>
+    <LI><A HREF="#bugs">BUGS</A></LI>
+    <LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+    Math::Trig::Units - Inverse and hyperbolic trigonemetric Functions
+                         in degrees, radians or gradians.</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+    use Math::Trig::Units qw(dsin  dcos  tan   sec   csc   cot
+                             asin  acos  atan  asec  acsc  acot
+                             sinh  cosh  tanh  sech  csch  coth
+                             asinh acosh atanh asech acsch acoth
+                             deg_to_rad  rad_to_deg
+                             grad_to_rad rad_to_grad
+                             deg_to_grad grad_to_deg
+                             units       zero        approx);
+    $v = dsin($x);
+    $v = dcos($x);
+    $v = tan($x);
+    $v = sec($x);
+    $v = csc($x);
+    $v = cot($x);
+    $v = asin($x);
+    $v = acos($x);
+    $v = atan($x);
+    $v = asec($x);
+    $v = acsc($x);
+    $v = acot($x);
+    $v = sinh($x);
+    $v = cosh($x);
+    $v = tanh($x);
+    $v = sech($x);
+    $v = csch($x);
+    $v = coth($x);
+    $v = asinh($x);
+    $v = acosh($x);
+    $v = atanh($x);
+    $v = asech($x);
+    $v = acsch($x);
+    $v = acoth($x);
+    $degrees  = rad_to_deg($radians);
+    $radians  = deg_to_rad($degrees);
+    $degrees  = grad_to_deg($gradians);
+    $gradians = deg_to_grad($degrees);
+    $radians  = grad_to_rad($gradians);
+    $gradians = rad_to_grad($radians);</PRE>
+<PRE>
+    # set radians instead of degrees (default)
+    Math::Trig::Units::units('radians');
+    # set gradians as units
+    Math::Trig::Units::units('gradians');
+    # set degrees as units
+    Math::Trig::Units::units('degrees');
+    # return current unit setting
+    $units = Math::Trig::Units::units();</PRE>
+<PRE>
+    # set the factor that allows a function that is almost zero to be zero
+    # if int(func($x)*factor) == 0 then the function will be assumed to
+    # return zero rather than 0.00000000000001
+    Math::Trig::Units::zero(10e10);</PRE>
+<PRE>
+    # to make functions in degrees or radians return the expected value
+    # we can use the approx() function
+    approx(dsin(30)) == 0.5  # without approx it would be 0.49999999999999945</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module exports the missing inverse and hyperbolic trigonometric
+functions of real numbers.  The inverse functions return values
+cooresponding to the principal values.  Specifying an argument outside
+of the domain of the function where an illegal divion by zero would occur
+will cause infinity to be returned. Infinity is Perl's version of this.</P>
+<P>This module implements the functions in degrees by default. If you want
+radians use Math::Trig or set the units via the units sub:</P>
+<PRE>
+    # set radians instead of degrees (default)
+    Math::Trig::Units::units('radians');
+    # set gradians as units
+    Math::Trig::Units::units('gradians');
+    # set degrees as units
+    Math::Trig::Units::units('degrees');
+    # return current unit setting
+    $units = Math::Trig::Units::units();</PRE>
+<P>A value of Pi to 30 decimal places is used in the source. This
+will be truncated by your version of Perl to the longest float supported.</P>
+<P>To avoid redefining the internal <CODE>sin()</CODE> and <CODE>cos()</CODE> functions this module
+calls the functions <CODE>dsin()</CODE> and dcos().</P>
+<P>
+<H3><A NAME="units">units</A></H3>
+<P>Set the units. Options are 'radians', 'degrees', 'gradians' and are case
+insensitive. Alternatively you can call the subclasses</P>
+<PRE>
+    Math::Trig::Degree
+    Math::Trig::Radian
+    Math::Trig::Gradian</PRE>
+<P>
+<H3><A NAME="zero">zero</A></H3>
+<P>If a function returns a value like 0.0000000000001 the correct value is
+in fact probably 0. When we have a 1/func() expression the return value
+should thus be #INF rather than some arbitarily large integer. To round
+very small numbers to zero for this purpose we use</P>
+<PRE>
+    int( func() * factor )</PRE>
+<P>By default a factor or 1e12 is used so 1e-12 is not zero but 1e-13 is.
+You can set any factor you want although he default should work fine.</P>
+<P>
+<H3><A NAME="approx">approx</A></H3>
+<P>Because of the limit on the accuracy of the vaule of Pi that is easily
+supported via a float you will get values like <CODE>dsin(30)</CODE> = 0.49999999999999945
+when using degrees (or gradians). This can be fixed using the <CODE>approx()</CODE>
+function.</P>
+<P>By default the approx sub will modify numbers so if we have a number like
+0.499999945 with 6 9s or 0.50000012 with 6 0s the number will be rounded to
+0.5. It also works on numbers like 5.250000001. This is useful when using
+degrees or gradians. In degrees these functions will return 0.5 as expected</P>
+<PRE>
+    approx(dsin(30))
+    approx(dcos(30))</PRE>
+<P>The approx sub takes a second optional argument that specifies how many
+0s or 9s in a row will trigger rounding. The default is 6.</P>
+<PRE>
+    approx($num, 7);  # will return 0.5 for 0.500000001 but 0.50000001 if
+                      # that is passed as it only has 6 zeros.</PRE>
+<P>Numbers that do not fulfill the requisite criteria are returned unchanged.
+For example 0.5000001 will not be rounded to 0.5 as it only has 5 0s.</P>
+<P>
+<H3><A NAME="dsin">dsin</A></H3>
+<P>returns sin of real argument.</P>
+<P>
+<H3><A NAME="dcos">dcos</A></H3>
+<P>returns cos of real argument.</P>
+<P>
+<H3><A NAME="tan">tan</A></H3>
+<P>returns tangent of real argument.</P>
+<P>
+<H3><A NAME="sec">sec</A></H3>
+<P>returns secant of real argument.</P>
+<P>
+<H3><A NAME="csc">csc</A></H3>
+<P>returns cosecant of real argument.</P>
+<P>
+<H3><A NAME="cot">cot</A></H3>
+<P>returns cotangent of real argument.</P>
+<P>
+<H3><A NAME="asin">asin</A></H3>
+<P>returns inverse sine of real argument.</P>
+<P>
+<H3><A NAME="acos">acos</A></H3>
+<P>returns inverse cosine of real argument.</P>
+<P>
+<H3><A NAME="atan">atan</A></H3>
+<P>returns inverse tangent of real argument.</P>
+<P>
+<H3><A NAME="asec">asec</A></H3>
+<P>returns inverse secant of real argument.</P>
+<P>
+<H3><A NAME="acsc">acsc</A></H3>
+<P>returns inverse cosecant of real argument.</P>
+<P>
+<H3><A NAME="acot">acot</A></H3>
+<P>returns inverse cotangent of real argument.</P>
+<P>
+<H3><A NAME="sinh">sinh</A></H3>
+<P>returns hyperbolic sine of real argument.</P>
+<P>
+<H3><A NAME="cosh">cosh</A></H3>
+<P>returns hyperbolic cosine of real argument.</P>
+<P>
+<H3><A NAME="tanh">tanh</A></H3>
+<P>returns hyperbolic tangent of real argument.</P>
+<P>
+<H3><A NAME="sech">sech</A></H3>
+<P>returns hyperbolic secant of real argument.</P>
+<P>
+<H3><A NAME="csch">csch</A></H3>
+<P>returns hyperbolic cosecant of real argument.</P>
+<P>
+<H3><A NAME="coth">coth</A></H3>
+<P>returns hyperbolic cotangent of real argument.</P>
+<P>
+<H3><A NAME="asinh">asinh</A></H3>
+<P>returns inverse hyperbolic sine of real argument.</P>
+<P>
+<H3><A NAME="acosh">acosh</A></H3>
+<P>returns inverse hyperbolic cosine of real argument.</P>
+<P>(positive value only)</P>
+<P>
+<H3><A NAME="atanh">atanh</A></H3>
+<P>returns inverse hyperbolic tangent of real argument.</P>
+<P>
+<H3><A NAME="asech">asech</A></H3>
+<P>returns inverse hyperbolic secant of real argument.</P>
+<P>(positive value only)</P>
+<P>
+<H3><A NAME="acsch">acsch</A></H3>
+<P>returns inverse hyperbolic cosecant of real argument.</P>
+<P>
+<H3><A NAME="acoth">acoth</A></H3>
+<P>returns inverse hyperbolic cotangent of real argument.</P>
+<P>
+<HR>
+<H1><A NAME="history">HISTORY</A></H1>
+<P>Modification of Math::Trig by request from stefan_k.</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>Because of the limit on the accuracy of the vaule of Pi that is easily
+supported via a float you will get values like <CODE>dsin(30)</CODE> = 0.49999999999999945
+when using degrees. This can be fixed using the <CODE>approx()</CODE> function</P>
+<P>Let me know about any others.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Initial Version John A.R. Williams &lt;<A HREF="mailto:J.A.R.Williams@aston.ac.uk">J.A.R.Williams@aston.ac.uk</A>&gt;
+Bug fixes and many additonal functions Jason Smith &lt;<A HREF="mailto:smithj4@rpi.edu">smithj4@rpi.edu</A>&gt;
+This version James Freeman &lt;<A HREF="mailto:james.freeman@id3.org.uk">james.freeman@id3.org.uk</A>&gt;</P>
+<TABLE BORDER=0 CELLPADDING=0 CELLSPACING=0 WIDTH=100%>
+<TR><TD CLASS=block VALIGN=MIDDLE WIDTH=100% BGCOLOR="#cccccc">
+<FONT SIZE=+1><STRONG><P CLASS=block>&nbsp;Units.pm</P></STRONG></FONT>
+</TD></TR>
+</TABLE>
+
+</BODY>
+
+</HTML>
