@@ -24,9 +24,7 @@
 
         <UL>
 
-            <LI><A HREF="#units">units</A></LI>
-            <LI><A HREF="#zero">zero</A></LI>
-            <LI><A HREF="#approx">approx</A></LI>
+            <LI><A HREF="#units( [units] )">units( [UNITS] )</A></LI>
             <LI><A HREF="#dsin">dsin</A></LI>
             <LI><A HREF="#dcos">dcos</A></LI>
             <LI><A HREF="#tan">tan</A></LI>
@@ -78,7 +76,7 @@
                              deg_to_rad  rad_to_deg
                              grad_to_rad rad_to_grad
                              deg_to_grad grad_to_deg
-                             units       zero        approx);
+                             units );
     $v = dsin($x);
     $v = dcos($x);
     $v = tan($x);
@@ -118,15 +116,6 @@
     Math::Trig::Units::units('degrees');
     # return current unit setting
     $units = Math::Trig::Units::units();</PRE>
-<PRE>
-    # set the factor that allows a function that is almost zero to be zero
-    # if int(func($x)*factor) == 0 then the function will be assumed to
-    # return zero rather than 0.00000000000001
-    Math::Trig::Units::zero(10e10);</PRE>
-<PRE>
-    # to make functions in degrees or radians return the expected value
-    # we can use the approx() function
-    approx(dsin(30)) == 0.5  # without approx it would be 0.49999999999999945</PRE>
 <P>
 <HR>
 <H1><A NAME="description">DESCRIPTION</A></H1>
@@ -135,10 +124,10 @@ functions of real numbers.  The inverse functions return values
 cooresponding to the principal values.  Specifying an argument outside
 of the domain of the function where an illegal divion by zero would occur
 will cause infinity to be returned. Infinity is Perl's version of this.</P>
-<P>This module implements the functions in degrees by default. If you want
-radians use Math::Trig or set the units via the units sub:</P>
+<P>This module implements the functions in radians by default. You set the
+units via the units sub:</P>
 <PRE>
-    # set radians instead of degrees (default)
+    # set radians as units (default)
     Math::Trig::Units::units('radians');
     # set gradians as units
     Math::Trig::Units::units('gradians');
@@ -146,48 +135,17 @@ radians use Math::Trig or set the units via the units sub:</P>
     Math::Trig::Units::units('degrees');
     # return current unit setting
     $units = Math::Trig::Units::units();</PRE>
-<P>A value of Pi to 30 decimal places is used in the source. This
-will be truncated by your version of Perl to the longest float supported.</P>
 <P>To avoid redefining the internal <CODE>sin()</CODE> and <CODE>cos()</CODE> functions this module
 calls the functions <CODE>dsin()</CODE> and dcos().</P>
 <P>
-<H3><A NAME="units">units</A></H3>
-<P>Set the units. Options are 'radians', 'degrees', 'gradians' and are case
-insensitive. Alternatively you can call the subclasses</P>
+<H3><A NAME="units( [units] )">units( [UNITS] )</A></H3>
+<P>Set or get the units. Options are 'radians', 'degrees', 'gradians' and are
+case insensitive. When called without an argument this function returns the
+current units setting. Alternatively you can call the subclasses:</P>
 <PRE>
     Math::Trig::Degree
     Math::Trig::Radian
     Math::Trig::Gradian</PRE>
-<P>
-<H3><A NAME="zero">zero</A></H3>
-<P>If a function returns a value like 0.0000000000001 the correct value is
-in fact probably 0. When we have a 1/func() expression the return value
-should thus be #INF rather than some arbitarily large integer. To round
-very small numbers to zero for this purpose we use</P>
-<PRE>
-    int( func() * factor )</PRE>
-<P>By default a factor or 1e12 is used so 1e-12 is not zero but 1e-13 is.
-You can set any factor you want although he default should work fine.</P>
-<P>
-<H3><A NAME="approx">approx</A></H3>
-<P>Because of the limit on the accuracy of the vaule of Pi that is easily
-supported via a float you will get values like <CODE>dsin(30)</CODE> = 0.49999999999999945
-when using degrees (or gradians). This can be fixed using the <CODE>approx()</CODE>
-function.</P>
-<P>By default the approx sub will modify numbers so if we have a number like
-0.499999945 with 6 9s or 0.50000012 with 6 0s the number will be rounded to
-0.5. It also works on numbers like 5.250000001. This is useful when using
-degrees or gradians. In degrees these functions will return 0.5 as expected</P>
-<PRE>
-    approx(dsin(30))
-    approx(dcos(30))</PRE>
-<P>The approx sub takes a second optional argument that specifies how many
-0s or 9s in a row will trigger rounding. The default is 6.</P>
-<PRE>
-    approx($num, 7);  # will return 0.5 for 0.500000001 but 0.50000001 if
-                      # that is passed as it only has 6 zeros.</PRE>
-<P>Numbers that do not fulfill the requisite criteria are returned unchanged.
-For example 0.5000001 will not be rounded to 0.5 as it only has 5 0s.</P>
 <P>
 <H3><A NAME="dsin">dsin</A></H3>
 <P>returns sin of real argument.</P>
@@ -269,10 +227,7 @@ For example 0.5000001 will not be rounded to 0.5 as it only has 5 0s.</P>
 <P>
 <HR>
 <H1><A NAME="bugs">BUGS</A></H1>
-<P>Because of the limit on the accuracy of the vaule of Pi that is easily
-supported via a float you will get values like <CODE>dsin(30)</CODE> = 0.49999999999999945
-when using degrees. This can be fixed using the <CODE>approx()</CODE> function</P>
-<P>Let me know about any others.</P>
+<P>All known ones have been fixed (see changes). Let me know if you find one.</P>
 <P>
 <HR>
 <H1><A NAME="author">AUTHOR</A></H1>

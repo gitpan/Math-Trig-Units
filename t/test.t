@@ -1,16 +1,17 @@
 use Test;
-#use strict;
-#use warnings;
+use strict;
+use warnings;
 
-BEGIN { plan tests => 206 };
+BEGIN { plan tests => 196 };
 
-use Math::Trig::Units qw(dsin dcos tan sec csc cot asin acos atan asec acsc acot sinh cosh tanh sech csch coth asinh acosh atanh asech acsch acoth approx);
+use Math::Trig::Units qw(dsin dcos tan sec csc cot asin acos atan asec acsc acot sinh cosh tanh sech csch coth asinh acosh atanh asech acsch acoth );
 
 ok(1);
 
-my $pi = 3.1415926535897932384626433832795028841971693993751058209;
+my $pi = atan2(1,1)*4;
 
 # degrees
+Math::Trig::Units::units('degrees');
 test_to_from( 0, 30, 45, 60, 90 );
 
 # gradians
@@ -20,20 +21,6 @@ test_to_from( 0, 25, 50, 75, 100 );
 # radians
 Math::Trig::Units::units('radians');
 test_to_from( 0, $pi/8, $pi/6, $pi/4, $pi/2 );
-
-# test approx function
-Math::Trig::Units::units('degrees');
-ok(approx(dsin(30)), 0.5);
-ok(approx(dcos(60)), 0.5);
-ok(approx(0.250000001), 0.25);
-ok(approx(0.25000001), 0.25000001);
-ok(approx(0.249999991), 0.25);
-ok(approx(0.25999991), 0.25999991);
-ok(approx(0.2500001, 4), 0.25);
-ok(approx(0.250001, 4), 0.250001);
-ok(approx(0.2499991, 4), 0.25);
-ok(approx(0.259991, 4), 0.259991);
-
 
 sub test_to_from {
     my @range = @_;

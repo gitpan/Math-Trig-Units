@@ -4,7 +4,7 @@ require Exporter;
 use Carp;
 
 use vars qw( @ISA @EXPORT_OK $VERSION $UNITS $ZERO $pi $inf );
-$VERSION = '0.02';
+$VERSION = '0.03';
 @ISA=qw(Exporter);
 @EXPORT_OK=qw(
     dsin    asin
@@ -23,14 +23,11 @@ $VERSION = '0.02';
     grad_to_rad rad_to_grad
     deg_to_grad grad_to_deg
     units
-    zero
-    approx
     );
 
-BEGIN { $pi = 3.1415926535897932384626433832795028841971693993751058209;
-        $inf = exp(1000000);
-        $UNITS = 'degrees';
-        $ZERO  = 1e12;
+BEGIN { $pi    = atan2(1,1)*4;
+        $inf   = exp(1000000);
+        $UNITS = 'radians';
       }
 
 sub deg_to_rad  { my $x=$_[0]; ($x/180) * $pi }
@@ -58,40 +55,17 @@ sub units {
   return $UNITS;
 }
 
-sub zero {
-   $ZERO = $_[0] if $_[0];
-   confess( "You need a bigger number like 10e10" ) unless $ZERO > 1e10;
-  return $ZERO;
-}
-
-sub approx {
-    my ( $num, $dp ) = @_;
-    $dp ||= 6;
-    if ( $num =~ m/\d*\.(\d*?)(9{$dp,})\d*/ ) {
-        my $exp = 10** (length $1 + length $2);
-      return int(($num * $exp) +1 )/$exp;
-
-    }
-    elsif ( $num =~ m/\d*\.(\d*?)(0{$dp,})\d*/ ) {
-        my $exp = 10** (length $1 + length $2);
-      return int($num * $exp)/$exp;
-    }
-    else {
-        return $num;
-    }
-}
-
 sub dsin { my $x=$_[0];  $x=units_to_rad($x); return  sin($x) }
 
 sub dcos { my $x=$_[0];  $x=units_to_rad($x); return cos($x) }
 
-sub tan { my $x=$_[0]; $x=units_to_rad($x); return int(cos($x)*$ZERO)==0 ? $inf : sin($x)/cos($x) }
+sub tan { my $x=$_[0]; $x=units_to_rad($x); return cos($x)==0 ? $inf : sin($x)/cos($x) }
 
-sub sec { my $x=$_[0]; $x=units_to_rad($x); return int(cos($x)*$ZERO)==0 ? $inf : 1/cos($x) }
+sub sec { my $x=$_[0]; $x=units_to_rad($x); return cos($x)==0 ? $inf : 1/cos($x) }
 
-sub csc { my $x=$_[0]; $x=units_to_rad($x); return int(sin($x)*$ZERO)==0 ? $inf : 1/sin($x) }
+sub csc { my $x=$_[0]; $x=units_to_rad($x); return sin($x)==0 ? $inf : 1/sin($x) }
 
-sub cot { my $x=$_[0]; $x=units_to_rad($x); return int(sin($x)*$ZERO)==0 ? $inf : cos($x)/sin($x) }
+sub cot { my $x=$_[0]; $x=units_to_rad($x); return sin($x)==0 ? $inf : cos($x)/sin($x) }
 
 sub asin { my $x=$_[0]; return ($x<-1 or $x>1) ? undef : rad_to_units( atan2($x,sqrt(1-$x*$x)) ); }
 
@@ -165,7 +139,7 @@ __END__
                              deg_to_rad  rad_to_deg
                              grad_to_rad rad_to_grad
                              deg_to_grad grad_to_deg
-                             units       zero        approx);
+                             units );
     $v = dsin($x);
     $v = dcos($x);
     $v = tan($x);
@@ -206,15 +180,6 @@ __END__
     # return current unit setting
     $units = Math::Trig::Units::units();
 
-    # set the factor that allows a function that is almost zero to be zero
-    # if int(func($x)*factor) == 0 then the function will be assumed to
-    # return zero rather than 0.00000000000001
-    Math::Trig::Units::zero(10e10);
-
-    # to make functions in degrees or radians return the expected value
-    # we can use the approx() function
-    approx(dsin(30)) == 0.5  # without approx it would be 0.49999999999999945
-
 =head1 DESCRIPTION
 
 This module exports the missing inverse and hyperbolic trigonometric
@@ -223,10 +188,10 @@ cooresponding to the principal values.  Specifying an argument outside
 of the domain of the function where an illegal divion by zero would occur
 will cause infinity to be returned. Infinity is Perl's version of this.
 
-This module implements the functions in degrees by default. If you want
-radians use Math::Trig or set the units via the units sub:
+This module implements the functions in radians by default. You set the
+units via the units sub:
 
-    # set radians instead of degrees (default)
+    # set radians as units (default)
     Math::Trig::Units::units('radians');
     # set gradians as units
     Math::Trig::Units::units('gradians');
@@ -235,56 +200,18 @@ radians use Math::Trig or set the units via the units sub:
     # return current unit setting
     $units = Math::Trig::Units::units();
 
-A value of Pi to 30 decimal places is used in the source. This
-will be truncated by your version of Perl to the longest float supported.
-
 To avoid redefining the internal sin() and cos() functions this module
 calls the functions dsin() and dcos().
 
-=head3 units
+=head3 units( [UNITS] )
 
-Set the units. Options are 'radians', 'degrees', 'gradians' and are case
-insensitive. Alternatively you can call the subclasses
+Set or get the units. Options are 'radians', 'degrees', 'gradians' and are
+case insensitive. When called without an argument this function returns the
+current units setting. Alternatively you can call the subclasses:
 
     Math::Trig::Degree
     Math::Trig::Radian
     Math::Trig::Gradian
-
-=head3 zero
-
-If a function returns a value like 0.0000000000001 the correct value is
-in fact probably 0. When we have a 1/func() expression the return value
-should thus be #INF rather than some arbitarily large integer. To round
-very small numbers to zero for this purpose we use
-
-    int( func() * factor )
-
-By default a factor or 1e12 is used so 1e-12 is not zero but 1e-13 is.
-You can set any factor you want although he default should work fine.
-
-=head3 approx
-
-Because of the limit on the accuracy of the vaule of Pi that is easily
-supported via a float you will get values like dsin(30) = 0.49999999999999945
-when using degrees (or gradians). This can be fixed using the approx()
-function.
-
-By default the approx sub will modify numbers so if we have a number like
-0.499999945 with 6 9s or 0.50000012 with 6 0s the number will be rounded to
-0.5. It also works on numbers like 5.250000001. This is useful when using
-degrees or gradians. In degrees these functions will return 0.5 as expected
-
-    approx(dsin(30))
-    approx(dcos(30))
-
-The approx sub takes a second optional argument that specifies how many
-0s or 9s in a row will trigger rounding. The default is 6.
-
-    approx($num, 7);  # will return 0.5 for 0.500000001 but 0.50000001 if
-                      # that is passed as it only has 6 zeros.
-
-Numbers that do not fulfill the requisite criteria are returned unchanged.
-For example 0.5000001 will not be rounded to 0.5 as it only has 5 0s.
 
 =head3 dsin
 
@@ -392,11 +319,7 @@ Modification of Math::Trig by request from stefan_k.
 
 =head1 BUGS
 
-Because of the limit on the accuracy of the vaule of Pi that is easily
-supported via a float you will get values like dsin(30) = 0.49999999999999945
-when using degrees. This can be fixed using the approx() function
-
-Let me know about any others.
+All known ones have been fixed (see changes). Let me know if you find one.
 
 =head1 AUTHOR
 
